@@ -23,10 +23,9 @@ class CharacterRepositoryImpl @Inject constructor(
     }
 
     override suspend fun refreshCharacters() {
-        // Check if the database is empty by trying to fetch one item
         val localData = characterDao.getAllCharacters(limit = 1, offset = 0).first()
         if (localData.isEmpty()) {
-            val characters = apiService.getCharacters() // Assuming this fetches all characters
+            val characters = apiService.getCharacters()
             characterDao.insertAll(characters)
         }
     }
