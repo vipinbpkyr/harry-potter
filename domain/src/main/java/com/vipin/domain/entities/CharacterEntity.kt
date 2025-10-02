@@ -1,6 +1,6 @@
 package com.vipin.domain.entities
 
-data class Character(
+data class CharacterEntity(
     val id: String,
     val name: String,
     val actor: String,
