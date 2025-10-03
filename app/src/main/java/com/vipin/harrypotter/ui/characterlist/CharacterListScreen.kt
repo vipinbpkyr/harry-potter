@@ -31,11 +31,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.vipin.domain.entities.CharacterEntity
+import com.vipin.harrypotter.CharacterDetailRoute
+import com.vipin.harrypotter.R
 import com.vipin.harrypotter.ui.theme.Gryffindor
 import com.vipin.harrypotter.ui.theme.HarryPotterTheme
 import com.vipin.harrypotter.ui.theme.Hufflepuff
@@ -54,7 +57,7 @@ fun CharacterListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Harry Potter Characters") },
+                title = { Text(stringResource(R.string.character_list_title)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -84,16 +87,22 @@ fun CharacterListScreen(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = "Error: ${uiState.error}", color = MaterialTheme.colorScheme.error)
+                        Text(
+                            text = stringResource(R.string.character_list_error, uiState.error),
+                            color = MaterialTheme.colorScheme.error
+                        )
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(onClick = onRetryClicked) {
-                            Text("Retry")
+                            Text(stringResource(R.string.retry))
                         }
                     }
                 }
                 uiState.characters.isEmpty() && !uiState.isLoadingInitial -> {
-                    Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
-                        Text("No characters found.")
+                    Box(
+                        modifier = Modifier.fillMaxSize().padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(stringResource(R.string.no_characters_found))
                     }
                 }
                 else -> {
@@ -102,7 +111,7 @@ fun CharacterListScreen(
                     ) {
                         items(uiState.characters) { character ->
                             CharacterListItem(character = character) {
-                                navController.navigate("character_detail/${character.id}")
+                                navController.navigate(CharacterDetailRoute(character.id))
                             }
                         }
                         item {
@@ -114,12 +123,14 @@ fun CharacterListScreen(
                                             .fillMaxWidth()
                                             .padding(16.dp)
                                     ) {
-                                        Text("Load More")
+                                        Text(stringResource(R.string.load_more))
                                     }
                                 }
                                 if (uiState.isLoadingMore) {
                                     Box(
-                                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         CircularProgressIndicator(modifier = Modifier.size(32.dp))
@@ -140,7 +151,7 @@ fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
     TextField(
         value = query,
         onValueChange = onQueryChange,
-        label = { Text("Search by name or actor") },
+        label = { Text(stringResource(R.string.search_placeholder)) },
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
@@ -163,8 +174,14 @@ fun CharacterListItem(character: CharacterEntity, onClick: () -> Unit) {
             Spacer(modifier = Modifier.width(16.dp))
             Column {
                 Text(text = character.name, style = MaterialTheme.typography.titleMedium)
-                Text(text = "Actor: ${character.actor}", style = MaterialTheme.typography.bodyMedium)
-                Text(text = "Species: ${character.species}", style = MaterialTheme.typography.bodySmall)
+                Text(
+                    text = stringResource(R.string.character_actor, character.actor),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = stringResource(R.string.character_species, character.species),
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
         }
     }
@@ -193,7 +210,21 @@ fun HouseColorIndicator(house: String?) {
 fun CharacterListScreenPreview_Populated() {
     val navController = rememberNavController()
     val sampleCharacters = List(5) { i ->
-        CharacterEntity(id = "$i", name = "Character Name ${i+1}", actor = "Actor Name ${i+1}", house = when(i%4) {0->"Gryffindor" 1->"Slytherin" 2->"Ravenclaw" else->"Hufflepuff"}, species = "Human", image = "", dateOfBirth = null, alive = true)
+        CharacterEntity(
+            id = "$i",
+            name = "Character Name ${i + 1}",
+            actor = "Actor Name ${i + 1}",
+            house = when (i % 4) {
+                0 -> "Gryffindor"
+                1 -> "Slytherin"
+                2 -> "Ravenclaw"
+                else -> "Hufflepuff"
+            },
+            species = "Human",
+            image = "",
+            dateOfBirth = null,
+            alive = true
+        )
     }
     val sampleUiState = CharacterListUiState(
         characters = sampleCharacters,
@@ -283,7 +314,16 @@ fun CharacterListScreenPreview_Empty() {
 fun CharacterListScreenPreview_LoadingMore() {
     val navController = rememberNavController()
     val sampleCharacters = List(5) { i ->
-        CharacterEntity(id = "$i", name = "Character Name ${i+1}", actor = "Actor Name ${i+1}", house = "Gryffindor", species = "Human", image = "", dateOfBirth = null, alive = true)
+        CharacterEntity(
+            id = "$i",
+            name = "Character Name ${i + 1}",
+            actor = "Actor Name ${i + 1}",
+            house = "Gryffindor",
+            species = "Human",
+            image = "",
+            dateOfBirth = null,
+            alive = true
+        )
     }
     val sampleUiState = CharacterListUiState(
         characters = sampleCharacters,

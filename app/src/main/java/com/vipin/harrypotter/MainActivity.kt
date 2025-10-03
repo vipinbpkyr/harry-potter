@@ -22,6 +22,16 @@ import com.vipin.harrypotter.ui.characterlist.CharacterListScreen
 import com.vipin.harrypotter.ui.characterlist.CharacterListViewModel
 import com.vipin.harrypotter.ui.theme.HarryPotterTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.serialization.Serializable
+
+@Serializable
+sealed interface AppRoute
+
+@Serializable
+object CharacterListRoute : AppRoute
+
+@Serializable
+data class CharacterDetailRoute(val characterId: String) : AppRoute
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -44,8 +54,8 @@ class MainActivity : ComponentActivity() {
 fun AppNavgraph() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "character_list") {
-        composable("character_list") {
+    NavHost(navController = navController, startDestination = CharacterListRoute) {
+        composable<CharacterListRoute> {
             val viewModel: CharacterListViewModel = hiltViewModel()
             val uiState = viewModel.uiState.collectAsState().value
 
@@ -58,7 +68,7 @@ fun AppNavgraph() {
             )
         }
 
-        composable("character_detail/{characterId}") { backStackEntry ->
+        composable<CharacterDetailRoute> { backStackEntry ->
             val viewModel: CharacterDetailViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsState()
             CharacterDetailScreen(

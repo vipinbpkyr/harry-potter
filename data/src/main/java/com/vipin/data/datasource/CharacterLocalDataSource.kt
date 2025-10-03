@@ -5,13 +5,13 @@ import com.vipin.data.model.Character
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-interface CharacterLocalDataSource {
+internal interface CharacterLocalDataSource {
     fun getAllCharacters(limit: Int, offset: Int, query: String): Flow<List<Character>>
     fun getCharacterById(id: String): Flow<Character>
     suspend fun insertAll(characters: List<Character>)
 }
 
-class CharacterLocalDataSourceImpl @Inject constructor(
+internal class CharacterLocalDataSourceImpl @Inject constructor(
     private val characterDao: CharacterDao
 ) : CharacterLocalDataSource {
     override fun getAllCharacters(limit: Int, offset: Int, query: String): Flow<List<Character>> =

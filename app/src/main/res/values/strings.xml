@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Harry Potter</string>
+    <string name="character_list_title">Harry Potter Characters</string>
+    <string name="character_list_error">Error: %1$s</string>
+    <string name="retry">Retry</string>
+    <string name="no_characters_found">No characters found.</string>
+    <string name="load_more">Load More</string>
+    <string name="search_placeholder">Search by name or actor</string>
+    <string name="character_actor">Actor: %1$s</string>
+    <string name="character_species">Species: %1$s</string>
 </resources>

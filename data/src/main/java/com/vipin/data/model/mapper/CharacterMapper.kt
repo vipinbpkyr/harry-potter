@@ -3,7 +3,7 @@ package com.vipin.data.model.mapper
 import com.vipin.data.model.Character
 import com.vipin.domain.entities.CharacterEntity
 
-fun Character.toDomain(): CharacterEntity {
+internal fun Character.toDomain(): CharacterEntity {
     return CharacterEntity(
         id = this.id,
         name = this.name,

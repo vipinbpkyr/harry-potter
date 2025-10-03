@@ -8,7 +8,7 @@ import com.vipin.data.model.Character
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface CharacterDao {
+internal interface CharacterDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(characters: List<Character>)

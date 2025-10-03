@@ -5,6 +5,6 @@ import androidx.room.RoomDatabase
 import com.vipin.data.model.Character
 
 @Database(entities = [Character::class], version = 1, exportSchema = false)
-abstract class AppDatabase : RoomDatabase() {
+internal abstract class AppDatabase : RoomDatabase() {
     abstract fun characterDao(): CharacterDao
 }

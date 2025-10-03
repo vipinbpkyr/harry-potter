@@ -4,35 +4,23 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.vipin.domain.entities.CharacterEntity
 import com.vipin.domain.usecase.GetCharacterDetailsUseCase
-import dagger.hilt.android.testing.HiltAndroidRule
-import dagger.hilt.android.testing.HiltAndroidTest
-import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
-@HiltAndroidTest
-@Config(application = HiltTestApplication::class)
-@RunWith(RobolectricTestRunner::class)
 @ExperimentalCoroutinesApi
 class CharacterDetailViewModelTest {
-
-    @get:Rule
-    var hiltRule = HiltAndroidRule(this)
 
     private val testDispatcher = StandardTestDispatcher()
 
@@ -41,9 +29,8 @@ class CharacterDetailViewModelTest {
 
     @Before
     fun setUp() {
-        hiltRule.inject()
         Dispatchers.setMain(testDispatcher)
-        getCharacterDetailsUseCase = mockk(relaxed = true)
+        getCharacterDetailsUseCase = mockk()
     }
 
     @After
@@ -52,7 +39,7 @@ class CharacterDetailViewModelTest {
     }
 
     @Test
-    fun `test view model init, character details are fetched and ui state is updated`() = runTest {
+    fun `test view model init, character details are fetched and ui state is updated`() = runTest(testDispatcher) {
         // Given
         val character = CharacterEntity(
             id = "123",
@@ -74,8 +61,9 @@ class CharacterDetailViewModelTest {
 
         // Then
         viewModel.uiState.test {
-            val loadingState = awaitItem()
-            assertEquals(true, loadingState.isLoading)
+            assertEquals(true, awaitItem().isLoading)
+
+            advanceUntilIdle()
 
             val successState = awaitItem()
             assertEquals(character, successState.character)

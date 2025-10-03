@@ -23,7 +23,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 @Module
 @InstallIn(SingletonComponent::class)
-object DataModule {
+internal object DataModule {
 
     @Provides
     @Singleton
@@ -55,7 +55,7 @@ object DataModule {
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class DataSourceModule {
+internal abstract class DataSourceModule {
     @Binds
     abstract fun bindCharacterRemoteDataSource(
         characterRemoteDataSourceImpl: CharacterRemoteDataSourceImpl
@@ -69,7 +69,7 @@ abstract class DataSourceModule {
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class RepoModule {
+internal abstract class RepoModule {
     @Binds
     abstract fun bindCharacterRepository(
         characterRepositoryImpl: CharacterRepositoryImpl
