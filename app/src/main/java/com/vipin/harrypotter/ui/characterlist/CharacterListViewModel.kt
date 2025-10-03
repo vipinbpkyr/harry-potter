@@ -1,4 +1,4 @@
-package com.vipin.harrypotter.ui.character_list
+package com.vipin.harrypotter.ui.characterlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -55,27 +55,10 @@ class CharacterListViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(isLoadingMore = true, error = null)
             }
 
-            getCharactersUseCase(page = pageToLoad, pageSize = PAGE_SIZE)
+            getCharactersUseCase(page = pageToLoad, pageSize = PAGE_SIZE, query = _uiState.value.searchQuery)
                 .onEach { newCharactersPage ->
-                    val currentQuery = _uiState.value.searchQuery
-                    val filteredNewCharacters = if (currentQuery.isNotBlank()) {
-                        newCharactersPage.filter { character ->
-                            character.name.contains(currentQuery, ignoreCase = true) ||
-                                    (character.house?.contains(
-                                        currentQuery,
-                                        ignoreCase = true
-                                    ) == true) ||
-                                    (character.actor?.contains(
-                                        currentQuery,
-                                        ignoreCase = true
-                                    ) == true)
-                        }
-                    } else {
-                        newCharactersPage
-                    }
-
                     _uiState.value = _uiState.value.copy(
-                        characters = if (isSearchTriggered || pageToLoad == 1) filteredNewCharacters else _uiState.value.characters + filteredNewCharacters,
+                        characters = if (isSearchTriggered || pageToLoad == 1) newCharactersPage else _uiState.value.characters + newCharactersPage,
                         canLoadMore = newCharactersPage.size >= PAGE_SIZE,
                         isLoadingInitial = false,
                         isLoadingMore = false

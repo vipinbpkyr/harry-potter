@@ -5,9 +5,11 @@ import com.vipin.data.model.mapper.toDomain
 import com.vipin.data.remote.HarryPotterApiService
 import com.vipin.domain.entities.CharacterEntity
 import com.vipin.domain.repository.CharacterRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class CharacterRepositoryImpl @Inject constructor(
@@ -22,7 +24,7 @@ class CharacterRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun refreshCharacters() {
+    override suspend fun refreshCharacters() = withContext(Dispatchers.IO) {
         val localData = characterDao.getAllCharacters(limit = 1, offset = 0).first()
         if (localData.isEmpty()) {
             val characters = apiService.getCharacters()

@@ -1,4 +1,4 @@
-package com.vipin.harrypotter.di
+package com.vipin.data.di
 
 import android.content.Context
 import androidx.room.Room
@@ -19,7 +19,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+object DataModule {
 
     @Provides
     @Singleton

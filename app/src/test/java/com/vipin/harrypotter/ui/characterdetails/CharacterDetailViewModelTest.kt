@@ -1,4 +1,4 @@
-package com.vipin.harrypotter.ui.character_detail
+package com.vipin.harrypotter.ui.characterdetails
 
 import androidx.lifecycle.SavedStateHandle
 import com.vipin.domain.entities.CharacterEntity

@@ -1,4 +1,4 @@
-package com.vipin.harrypotter.ui.character_list
+package com.vipin.harrypotter.ui.characterlist
 
 import com.vipin.domain.entities.CharacterEntity
 import com.vipin.domain.usecase.GetCharactersUseCase

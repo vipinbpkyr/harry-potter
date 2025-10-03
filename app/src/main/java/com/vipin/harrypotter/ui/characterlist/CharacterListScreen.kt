@@ -1,4 +1,4 @@
-package com.vipin.harrypotter.ui.character_list
+package com.vipin.harrypotter.ui.characterlist
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,7 +48,7 @@ fun CharacterListScreen(
     uiState: CharacterListUiState,
     onSearchQueryChanged: (String) -> Unit,
     onLoadMoreClicked: () -> Unit,
-    onRetryClicked: () -> Unit, // Added for retry mechanism
+    onRetryClicked: () -> Unit,
     navController: NavController
 ) {
     Scaffold(
@@ -56,8 +56,8 @@ fun CharacterListScreen(
             TopAppBar(
                 title = { Text("Harry Potter Characters") },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
                 )
             )
         }
@@ -177,14 +177,14 @@ fun HouseColorIndicator(house: String?) {
         "Slytherin" -> Slytherin
         "Ravenclaw" -> Ravenclaw
         "Hufflepuff" -> Hufflepuff
-        else -> Color.Transparent // Or a default color like Color.Gray
+        else -> Color.Transparent
     }
     Box(
         modifier = Modifier
             .size(24.dp)
             .clip(CircleShape)
-            .background(color = color, shape = CircleShape) // Ensure shape matches clip for borderless circle
-            .then(if (color == Color.Transparent) Modifier else Modifier) // No border if transparent
+            .background(color = color, shape = CircleShape)
+            .then(if (color == Color.Transparent) Modifier else Modifier)
     )
 }
 

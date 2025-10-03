@@ -16,10 +16,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.vipin.harrypotter.ui.character_detail.CharacterDetailScreen
-import com.vipin.harrypotter.ui.character_detail.CharacterDetailViewModel
-import com.vipin.harrypotter.ui.character_list.CharacterListScreen
-import com.vipin.harrypotter.ui.character_list.CharacterListViewModel
+import com.vipin.harrypotter.ui.characterdetails.CharacterDetailScreen
+import com.vipin.harrypotter.ui.characterdetails.CharacterDetailViewModel
+import com.vipin.harrypotter.ui.characterlist.CharacterListScreen
+import com.vipin.harrypotter.ui.characterlist.CharacterListViewModel
 import com.vipin.harrypotter.ui.theme.HarryPotterTheme
 import dagger.hilt.android.AndroidEntryPoint
 
