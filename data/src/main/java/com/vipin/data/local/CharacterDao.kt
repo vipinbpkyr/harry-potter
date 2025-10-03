@@ -13,8 +13,8 @@ interface CharacterDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(characters: List<Character>)
 
-    @Query("SELECT * FROM characters LIMIT :limit OFFSET :offset")
-    fun getAllCharacters(limit: Int, offset: Int): Flow<List<Character>>
+    @Query("SELECT * FROM characters WHERE (:query = '' OR name LIKE '%' || :query || '%' OR actor LIKE '%' || :query || '%') LIMIT :limit OFFSET :offset")
+    fun getAllCharacters(limit: Int, offset: Int, query: String): Flow<List<Character>>
 
     @Query("SELECT * FROM characters WHERE id = :id")
     fun getCharacterById(id: String): Flow<Character>

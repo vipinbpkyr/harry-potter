@@ -17,15 +17,15 @@ class CharacterRepositoryImpl @Inject constructor(
     private val characterDao: CharacterDao
 ): CharacterRepository {
 
-    override fun getCharacters(page: Int, pageSize: Int): Flow<List<CharacterEntity>> {
+    override fun getCharacters(page: Int, pageSize: Int, query: String): Flow<List<CharacterEntity>> {
         val offset = (page - 1) * pageSize
-        return characterDao.getAllCharacters(limit = pageSize, offset = offset).map { characters ->
+        return characterDao.getAllCharacters(limit = pageSize, offset = offset, query = query).map { characters ->
             characters.map { it.toDomain() }
         }
     }
 
     override suspend fun refreshCharacters() = withContext(Dispatchers.IO) {
-        val localData = characterDao.getAllCharacters(limit = 1, offset = 0).first()
+        val localData = characterDao.getAllCharacters(limit = 1, offset = 0, query = "").first()
         if (localData.isEmpty()) {
             val characters = apiService.getCharacters()
             characterDao.insertAll(characters)
