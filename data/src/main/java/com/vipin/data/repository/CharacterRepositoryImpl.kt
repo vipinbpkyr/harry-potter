@@ -1,8 +1,8 @@
 package com.vipin.data.repository
 
-import com.vipin.data.local.CharacterDao
+import com.vipin.data.datasource.CharacterLocalDataSource
+import com.vipin.data.datasource.CharacterRemoteDataSource
 import com.vipin.data.model.mapper.toDomain
-import com.vipin.data.remote.HarryPotterApiService
 import com.vipin.domain.entities.CharacterEntity
 import com.vipin.domain.repository.CharacterRepository
 import kotlinx.coroutines.Dispatchers
@@ -13,24 +13,25 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class CharacterRepositoryImpl @Inject constructor(
-    private val apiService: HarryPotterApiService,
-    private val characterDao: CharacterDao
-): CharacterRepository {
+    private val remoteDataSource: CharacterRemoteDataSource,
+    private val localDataSource: CharacterLocalDataSource
+) : CharacterRepository {
 
     override fun getCharacters(page: Int, pageSize: Int, query: String): Flow<List<CharacterEntity>> {
         val offset = (page - 1) * pageSize
-        return characterDao.getAllCharacters(limit = pageSize, offset = offset, query = query).map { characters ->
+        return localDataSource.getAllCharacters(limit = pageSize, offset = offset, query = query).map { characters ->
             characters.map { it.toDomain() }
         }
     }
 
     override suspend fun refreshCharacters() = withContext(Dispatchers.IO) {
-        val localData = characterDao.getAllCharacters(limit = 1, offset = 0, query = "").first()
+        val localData = localDataSource.getAllCharacters(limit = 1, offset = 0, query = "").first()
         if (localData.isEmpty()) {
-            val characters = apiService.getCharacters()
-            characterDao.insertAll(characters)
+            val characters = remoteDataSource.getCharacters()
+            localDataSource.insertAll(characters)
         }
     }
 
-    override fun getCharacterById(id: String): Flow<CharacterEntity> = characterDao.getCharacterById(id).map { it.toDomain() }
+    override fun getCharacterById(id: String): Flow<CharacterEntity> =
+        localDataSource.getCharacterById(id).map { it.toDomain() }
 }
