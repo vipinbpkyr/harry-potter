@@ -10,11 +10,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.vipin.harrypotter.ui.character_detail.CharacterDetailScreen
+import com.vipin.harrypotter.ui.character_detail.CharacterDetailViewModel
 import com.vipin.harrypotter.ui.character_list.CharacterListScreen
 import com.vipin.harrypotter.ui.character_list.CharacterListViewModel
 import com.vipin.harrypotter.ui.theme.HarryPotterTheme
@@ -56,8 +59,12 @@ fun AppNavgraph() {
         }
 
         composable("character_detail/{characterId}") { backStackEntry ->
-            val characterId = backStackEntry.arguments?.getString("characterId")
-            // CharacterDetailScreen(characterId = characterId)
+            val viewModel: CharacterDetailViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsState()
+            CharacterDetailScreen(
+                uiState = uiState,
+                onNavigateBack = navController::popBackStack,
+                onRetry = {})
         }
     }
 }
