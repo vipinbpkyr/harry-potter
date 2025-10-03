@@ -1,8 +1,14 @@
 package com.vipin.harrypotter.ui.characterdetails
 
 import androidx.lifecycle.SavedStateHandle
+import app.cash.turbine.test
 import com.vipin.domain.entities.CharacterEntity
 import com.vipin.domain.usecase.GetCharacterDetailsUseCase
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.HiltTestApplication
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -13,26 +19,31 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+@HiltAndroidTest
+@Config(application = HiltTestApplication::class)
+@RunWith(RobolectricTestRunner::class)
 @ExperimentalCoroutinesApi
 class CharacterDetailViewModelTest {
+
+    @get:Rule
+    var hiltRule = HiltAndroidRule(this)
 
     private val testDispatcher = StandardTestDispatcher()
 
     private lateinit var getCharacterDetailsUseCase: GetCharacterDetailsUseCase
-    private lateinit var savedStateHandle: SavedStateHandle
     private lateinit var viewModel: CharacterDetailViewModel
 
     @Before
     fun setUp() {
+        hiltRule.inject()
         Dispatchers.setMain(testDispatcher)
-        getCharacterDetailsUseCase = mock()
-        savedStateHandle = SavedStateHandle().apply {
-            set("characterId", "123")
-        }
+        getCharacterDetailsUseCase = mockk(relaxed = true)
     }
 
     @After
@@ -53,16 +64,23 @@ class CharacterDetailViewModelTest {
             dateOfBirth = "31-07-1980",
             alive = true
         )
-        whenever(getCharacterDetailsUseCase("123")).thenReturn(flowOf(character))
+        val savedStateHandle = SavedStateHandle().apply {
+            set("characterId", "123")
+        }
+        every { getCharacterDetailsUseCase("123") } returns flowOf(character)
 
         // When
         viewModel = CharacterDetailViewModel(getCharacterDetailsUseCase, savedStateHandle)
-        testDispatcher.scheduler.advanceUntilIdle()
 
         // Then
-        val uiState = viewModel.uiState.value
-        assertEquals(character, uiState.character)
-        assertEquals(false, uiState.isLoading)
-        assertEquals(null, uiState.error)
+        viewModel.uiState.test {
+            val loadingState = awaitItem()
+            assertEquals(true, loadingState.isLoading)
+
+            val successState = awaitItem()
+            assertEquals(character, successState.character)
+            assertEquals(false, successState.isLoading)
+            assertEquals(null, successState.error)
+        }
     }
 }
