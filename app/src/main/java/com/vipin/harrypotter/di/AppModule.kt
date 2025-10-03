@@ -19,37 +19,39 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class AppModule {
+object AppModule {
 
-    companion object {
-        @Provides
-        @Singleton
-        fun provideRetrofit(): Retrofit =
-            Retrofit.Builder()
-                .baseUrl("https://hp-api.onrender.com/api/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
+    @Provides
+    @Singleton
+    fun provideRetrofit(): Retrofit =
+        Retrofit.Builder()
+            .baseUrl("https://hp-api.onrender.com/api/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
 
-        @Provides
-        @Singleton
-        fun provideHarryPotterApiService(retrofit: Retrofit): HarryPotterApiService =
-            retrofit.create(HarryPotterApiService::class.java)
+    @Provides
+    @Singleton
+    fun provideHarryPotterApiService(retrofit: Retrofit): HarryPotterApiService =
+        retrofit.create(HarryPotterApiService::class.java)
 
-        @Provides
-        @Singleton
-        fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
-            Room.databaseBuilder(
-                context,
-                AppDatabase::class.java,
-                "harry_potter_database"
-            ).build()
+    @Provides
+    @Singleton
+    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
+        Room.databaseBuilder(
+            context,
+            AppDatabase::class.java,
+            "harry_potter_database"
+        ).build()
 
-        @Provides
-        @Singleton
-        fun provideCharacterDao(appDatabase: AppDatabase): CharacterDao =
-            appDatabase.characterDao()
-    }
+    @Provides
+    @Singleton
+    fun provideCharacterDao(appDatabase: AppDatabase): CharacterDao =
+        appDatabase.characterDao()
+}
 
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class RepoModule {
     @Binds
     abstract fun bindCharacterRepository(
         characterRepositoryImpl: CharacterRepositoryImpl
