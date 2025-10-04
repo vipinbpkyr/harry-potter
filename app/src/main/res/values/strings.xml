@@ -8,4 +8,5 @@
     <string name="search_placeholder">Search by name or actor</string>
     <string name="character_actor">Actor: %1$s</string>
     <string name="character_species">Species: %1$s</string>
+    <string name="clear_search">Clear search</string>
 </resources>

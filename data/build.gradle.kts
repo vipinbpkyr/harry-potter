@@ -7,10 +7,10 @@ plugins {
 
 android {
     namespace = "com.vipin.data"
-    compileSdk = 36
+    compileSdk = 34
 
     defaultConfig {
-        minSdk = 29
+        minSdk = 28
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")

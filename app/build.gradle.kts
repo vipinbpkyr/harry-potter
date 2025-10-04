@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace = "com.vipin.harrypotter"
-    compileSdk = 36
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.vipin.harrypotter"
-        minSdk = 29
-        targetSdk = 36
+        minSdk = 28
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 

@@ -4,14 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -40,11 +38,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             HarryPotterTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Box(modifier = Modifier.padding(innerPadding)) {
-                        AppNavgraph()
-                    }
-                }
+                AppNavgraph()
             }
         }
     }
@@ -54,8 +48,24 @@ class MainActivity : ComponentActivity() {
 fun AppNavgraph() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = CharacterListRoute) {
-        composable<CharacterListRoute> {
+    NavHost(
+        navController = navController,
+        startDestination = CharacterListRoute,
+    ) {
+        composable<CharacterListRoute>(
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { -300 },
+                    animationSpec = tween(300)
+                )
+            },
+            popEnterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { -300 },
+                    animationSpec = tween(300)
+                )
+            },
+        ) {
             val viewModel: CharacterListViewModel = hiltViewModel()
             val uiState = viewModel.uiState.collectAsState().value
 
@@ -68,7 +78,20 @@ fun AppNavgraph() {
             )
         }
 
-        composable<CharacterDetailRoute> { backStackEntry ->
+        composable<CharacterDetailRoute>(
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { 1000 },
+                    animationSpec = tween(300)
+                )
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { 1000 },
+                    animationSpec = tween(300)
+                )
+            }
+        ) { backStackEntry ->
             val viewModel: CharacterDetailViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsState()
             CharacterDetailScreen(
