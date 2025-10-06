@@ -17,7 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -27,7 +27,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -35,14 +34,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.vipin.domain.entities.CharacterEntity
 import com.vipin.harrypotter.CharacterDetailRoute
 import com.vipin.harrypotter.R
+import com.vipin.harrypotter.SearchRoute
 import com.vipin.harrypotter.ui.theme.Gryffindor
 import com.vipin.harrypotter.ui.theme.HarryPotterTheme
 import com.vipin.harrypotter.ui.theme.Hufflepuff
@@ -53,7 +53,6 @@ import com.vipin.harrypotter.ui.theme.Slytherin
 @Composable
 fun CharacterListScreen(
     uiState: CharacterListUiState,
-    onSearchQueryChanged: (String) -> Unit,
     onLoadMoreClicked: () -> Unit,
     onRetryClicked: () -> Unit,
     navController: NavController
@@ -65,7 +64,16 @@ fun CharacterListScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                )
+                ),
+                actions = {
+                    IconButton(onClick = { navController.navigate(SearchRoute) }) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = stringResource(R.string.search_characters),
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                }
             )
         }
     ) { innerPadding ->
@@ -74,14 +82,6 @@ fun CharacterListScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            SearchBar(
-                query = uiState.searchQuery,
-                onQueryChange = onSearchQueryChanged,
-                onClear = {
-                    onSearchQueryChanged("")
-                }
-            )
-
             when {
                 uiState.isLoadingInitial -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -90,7 +90,7 @@ fun CharacterListScreen(
                 }
                 uiState.error != null && uiState.characters.isEmpty() -> {
                     Column(
-                        modifier = Modifier.fillMaxSize().padding(16.dp),
+                        modifier = Modifier.fillMaxSize().padding(dimensionResource(id = R.dimen.padding_medium)),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -98,7 +98,7 @@ fun CharacterListScreen(
                             text = stringResource(R.string.character_list_error, uiState.error),
                             color = MaterialTheme.colorScheme.error
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_small)))
                         Button(onClick = onRetryClicked) {
                             Text(stringResource(R.string.retry))
                         }
@@ -106,7 +106,7 @@ fun CharacterListScreen(
                 }
                 uiState.characters.isEmpty() && !uiState.isLoadingInitial -> {
                     Box(
-                        modifier = Modifier.fillMaxSize().padding(16.dp),
+                        modifier = Modifier.fillMaxSize().padding(dimensionResource(id = R.dimen.padding_medium)),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(stringResource(R.string.no_characters_found))
@@ -114,7 +114,7 @@ fun CharacterListScreen(
                 }
                 else -> {
                     LazyColumn(
-                        modifier = Modifier.weight(1f) // Make LazyColumn take available space
+                        modifier = Modifier.weight(1f)
                     ) {
                         items(uiState.characters) { character ->
                             CharacterListItem(character = character) {
@@ -122,26 +122,24 @@ fun CharacterListScreen(
                             }
                         }
                         item {
-                            if (uiState.searchQuery.isEmpty()) {
-                                if (uiState.canLoadMore && !uiState.isLoadingMore) {
-                                    Button(
-                                        onClick = onLoadMoreClicked,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp)
-                                    ) {
-                                        Text(stringResource(R.string.load_more))
-                                    }
+                            if (uiState.canLoadMore && !uiState.isLoadingMore) {
+                                Button(
+                                    onClick = onLoadMoreClicked,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(dimensionResource(id = R.dimen.padding_medium))
+                                ) {
+                                    Text(stringResource(R.string.load_more))
                                 }
-                                if (uiState.isLoadingMore) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        CircularProgressIndicator(modifier = Modifier.size(32.dp))
-                                    }
+                            }
+                            if (uiState.isLoadingMore) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(dimensionResource(id = R.dimen.padding_medium)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(modifier = Modifier.size(dimensionResource(id = R.dimen.circular_progress_size)))
                                 }
                             }
                         }
@@ -152,43 +150,20 @@ fun CharacterListScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SearchBar(query: String, onQueryChange: (String) -> Unit, onClear: () -> Unit) {
-    TextField(
-        value = query,
-        onValueChange = onQueryChange,
-        label = { Text(stringResource(R.string.search_placeholder)) },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        trailingIcon = {
-            if (query.isNotEmpty()) {
-                IconButton(onClick = onClear) {
-                    Icon(
-                        imageVector = Icons.Default.Clear,
-                        contentDescription = stringResource(R.string.clear_search)
-                    )
-                }
-            }
-        }
-    )
-}
-
 @Composable
 fun CharacterListItem(character: CharacterEntity, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .padding(horizontal = dimensionResource(id = R.dimen.padding_small), vertical = dimensionResource(id = R.dimen.card_vertical_padding))
             .clickable(onClick = onClick)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
             verticalAlignment = Alignment.CenterVertically
         ) {
             HouseColorIndicator(house = character.house)
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_medium)))
             Column {
                 Text(text = character.name, style = MaterialTheme.typography.titleMedium)
                 Text(
@@ -215,7 +190,7 @@ fun HouseColorIndicator(house: String?) {
     }
     Box(
         modifier = Modifier
-            .size(24.dp)
+            .size(dimensionResource(id = R.dimen.indicator_size))
             .clip(CircleShape)
             .background(color = color, shape = CircleShape)
             .then(if (color == Color.Transparent) Modifier else Modifier)
@@ -247,14 +222,12 @@ fun CharacterListScreenPreview_Populated() {
         characters = sampleCharacters,
         isLoadingInitial = false,
         isLoadingMore = false,
-        searchQuery = "",
         canLoadMore = true,
         error = null
     )
     HarryPotterTheme {
         CharacterListScreen(
             uiState = sampleUiState,
-            onSearchQueryChanged = { /* No-op */ },
             onLoadMoreClicked = { /* No-op */ },
             onRetryClicked = { /* No-op */ },
             navController = navController
@@ -269,13 +242,11 @@ fun CharacterListScreenPreview_LoadingInitial() {
     val sampleUiState = CharacterListUiState(
         characters = emptyList(),
         isLoadingInitial = true,
-        searchQuery = "",
         error = null
     )
     HarryPotterTheme {
         CharacterListScreen(
             uiState = sampleUiState,
-            onSearchQueryChanged = { /* No-op */ },
             onLoadMoreClicked = { /* No-op */ },
             onRetryClicked = { /* No-op */ },
             navController = navController
@@ -290,13 +261,11 @@ fun CharacterListScreenPreview_Error() {
     val sampleUiState = CharacterListUiState(
         characters = emptyList(),
         isLoadingInitial = false,
-        searchQuery = "",
         error = "Network request failed"
     )
     HarryPotterTheme {
         CharacterListScreen(
             uiState = sampleUiState,
-            onSearchQueryChanged = { /* No-op */ },
             onLoadMoreClicked = { /* No-op */ },
             onRetryClicked = { /* No-op */ },
             navController = navController
@@ -311,14 +280,12 @@ fun CharacterListScreenPreview_Empty() {
     val sampleUiState = CharacterListUiState(
         characters = emptyList(),
         isLoadingInitial = false,
-        searchQuery = "Unknown Character",
-        canLoadMore = false, // Important for empty state
+        canLoadMore = false,
         error = null
     )
     HarryPotterTheme {
         CharacterListScreen(
             uiState = sampleUiState,
-            onSearchQueryChanged = { /* No-op */ },
             onLoadMoreClicked = { /* No-op */ },
             onRetryClicked = { /* No-op */ },
             navController = navController
@@ -346,14 +313,12 @@ fun CharacterListScreenPreview_LoadingMore() {
         characters = sampleCharacters,
         isLoadingInitial = false,
         isLoadingMore = true,
-        searchQuery = "",
         canLoadMore = true,
         error = null
     )
     HarryPotterTheme {
         CharacterListScreen(
             uiState = sampleUiState,
-            onSearchQueryChanged = { /* No-op */ },
             onLoadMoreClicked = { /* No-op */ },
             onRetryClicked = { /* No-op */ },
             navController = navController

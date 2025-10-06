@@ -24,16 +24,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.vipin.domain.entities.CharacterEntity
+import com.vipin.harrypotter.R
 import com.vipin.harrypotter.ui.theme.HarryPotterTheme
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+import com.vipin.harrypotter.utils.formatDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,12 +46,12 @@ fun CharacterDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(uiState.character?.name ?: "Character Details") },
+                title = { Text(uiState.character?.name ?: stringResource(id = R.string.character_details_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(id = R.string.navigate_back)
                         )
                     }
                 },
@@ -68,7 +68,7 @@ fun CharacterDetailScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
+                .padding(dimensionResource(id = R.dimen.padding_medium)),
             contentAlignment = Alignment.Center
         ) {
             when {
@@ -83,9 +83,9 @@ fun CharacterDetailScreen(
                             color = MaterialTheme.colorScheme.error,
                             textAlign = TextAlign.Center
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
                         Button(onClick = onRetry) {
-                            Text("Retry")
+                            Text(stringResource(id = R.string.retry))
                         }
                     }
                 }
@@ -93,7 +93,7 @@ fun CharacterDetailScreen(
                     CharacterDetailsContent(character = uiState.character)
                 }
                 else -> {
-                    Text("Character not found.", style = MaterialTheme.typography.bodyLarge)
+                    Text(stringResource(id = R.string.no_characters_found), style = MaterialTheme.typography.bodyLarge)
                 }
             }
         }
@@ -105,49 +105,42 @@ private fun CharacterDetailsContent(character: CharacterEntity) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(dimensionResource(id = R.dimen.padding_medium)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(character.image)
                 .crossfade(true)
-                .error(android.R.drawable.ic_menu_gallery) // Placeholder for error
-                .placeholder(android.R.drawable.ic_menu_gallery) // Placeholder for loading
+                .error(android.R.drawable.ic_menu_gallery)
+                .placeholder(android.R.drawable.ic_menu_gallery)
                 .build(),
             contentDescription = character.name,
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .size(200.dp)
-                .padding(bottom = 16.dp)
+                .size(dimensionResource(id = R.dimen.image_size))
+                .padding(bottom = dimensionResource(id = R.dimen.padding_medium))
         )
         Text(text = character.name, style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_small)))
 
         Text(
-            text = "Actor: ${character.actor.takeIf { it.isNotBlank() } ?: "Unknown"}",
+            text = stringResource(id = R.string.character_actor, character.actor.takeIf { it.isNotBlank() } ?: stringResource(id = R.string.unknown)),
             style = MaterialTheme.typography.bodyLarge
         )
         Text(
-            text = "Species: ${character.species.takeIf { it.isNotBlank() } ?: "Unknown"}",
+            text = stringResource(id = R.string.character_species, character.species.takeIf { it.isNotBlank() } ?: stringResource(id = R.string.unknown)),
             style = MaterialTheme.typography.bodyLarge
         )
         Text(
-            text = "Status: ${if (character.alive) "Alive" else "Dead"}",
+            text = stringResource(
+                id = R.string.character_status,
+                if (character.alive) stringResource(id = R.string.character_status_alive) else stringResource(id = R.string.character_status_dead)
+            ),
             style = MaterialTheme.typography.bodyLarge
         )
-        character.dateOfBirth?.let {
-            val formattedDate = try {
-                val inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
-                val outputFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH)
-                LocalDate.parse(it, inputFormatter).format(outputFormatter)
-            } catch (e: Exception) {
-                "N/A"
-            }
-            Text(text = "Date of Birth: $formattedDate", style = MaterialTheme.typography.bodyLarge)
-        } ?: Text(text = "Date of Birth: N/A", style = MaterialTheme.typography.bodyLarge)
+        Text(text = stringResource(id = R.string.character_date_of_birth, formatDate(character.dateOfBirth)), style = MaterialTheme.typography.bodyLarge)
 
-        // Add more details
     }
 }
 
@@ -168,7 +161,7 @@ fun CharacterDetailScreenPreview_Loading() {
 fun CharacterDetailScreenPreview_Error() {
     HarryPotterTheme {
         CharacterDetailScreen(
-            uiState = CharacterDetailUiState(error = "Failed to load character details. Please try again."),
+            uiState = CharacterDetailUiState(error = stringResource(id = R.string.character_detail_preview_error)),
             onNavigateBack = {},
             onRetry = {}
         )

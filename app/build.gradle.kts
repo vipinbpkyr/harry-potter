@@ -45,6 +45,10 @@ android {
             isIncludeAndroidResources = true
         }
     }
+    packaging {
+        resources.excludes.add("META-INF/LICENSE.md")
+        resources.excludes.add("META-INF/LICENSE-notice.md")
+    }
 }
 hilt {
     enableAggregatingTask = false
@@ -63,7 +67,6 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":domain"))
 
-    // Add these lines for Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
@@ -79,14 +82,16 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit)
-    testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.turbine)
     testImplementation(libs.hilt.android.testing)
+    testImplementation(libs.mockk)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation("io.mockk:mockk-android:1.13.10")
+    androidTestImplementation("androidx.navigation:navigation-testing:2.8.0-beta05")
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }

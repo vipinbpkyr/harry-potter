@@ -19,7 +19,7 @@ import javax.inject.Inject
 data class CharacterListUiState(
     val characters: List<CharacterEntity> = emptyList(),
     val searchQuery: String = "",
-    val isLoadingInitial: Boolean = true, // Default to true
+    val isLoadingInitial: Boolean = true,
     val isLoadingMore: Boolean = false,
     val canLoadMore: Boolean = true,
     val error: String? = null
@@ -42,6 +42,15 @@ class CharacterListViewModel @Inject constructor(
 
     init {
         loadCharacters(isInitialLoad = true)
+    }
+
+    fun onSearchQueryChanged(query: String) {
+        _uiState.update { it.copy(searchQuery = query) }
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            delay(300)
+            loadCharacters(isInitialLoad = true)
+        }
     }
 
     private fun loadCharacters(isInitialLoad: Boolean) {
@@ -70,26 +79,16 @@ class CharacterListViewModel @Inject constructor(
                 .collect { newCharacters ->
                     _uiState.update {
                         it.copy(
-                            characters = if (pageToLoad == 1) newCharacters else it.characters + newCharacters,
+                            characters = if (isInitialLoad) newCharacters else it.characters + newCharacters,
                             canLoadMore = newCharacters.size >= PAGE_SIZE,
                             isLoadingInitial = false,
                             isLoadingMore = false
                         )
                     }
-                    if (pageToLoad == 1) {
+                    if (isInitialLoad) {
                         currentPage = 1
                     }
                 }
-        }
-    }
-
-    fun onSearchQueryChanged(query: String) {
-        searchJob?.cancel()
-        _uiState.update { it.copy(searchQuery = query) }
-        currentPage = 1
-        searchJob = viewModelScope.launch {
-            delay(300)
-            loadCharacters(isInitialLoad = true)
         }
     }
 

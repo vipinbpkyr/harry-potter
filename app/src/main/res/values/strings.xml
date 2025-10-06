@@ -9,4 +9,18 @@
     <string name="character_actor">Actor: %1$s</string>
     <string name="character_species">Species: %1$s</string>
     <string name="clear_search">Clear search</string>
+    <string name="search_characters">Search Characters</string>
+    <string name="navigate_back">Navigate back</string>
+    <string name="failed_to_load_characters">Failed to load characters: %1$s</string>
+    <string name="character_search_error">Failed to load characters: %s</string>
+
+    <string name="character_details_title">Character Details</string>
+    <string name="unknown">Unknown</string>
+    <string name="character_status">Status: %1$s</string>
+    <string name="character_status_alive">Alive</string>
+    <string name="character_status_dead">Dead</string>
+    <string name="character_date_of_birth">Date of Birth: %1$s</string>
+    <string name="character_detail_preview_error">Failed to load character details. Please try again.</string>
+    <string name="loading">Loading</string>
+
 </resources>

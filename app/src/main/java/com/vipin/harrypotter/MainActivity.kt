@@ -4,7 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
@@ -18,6 +19,8 @@ import com.vipin.harrypotter.ui.characterdetails.CharacterDetailScreen
 import com.vipin.harrypotter.ui.characterdetails.CharacterDetailViewModel
 import com.vipin.harrypotter.ui.characterlist.CharacterListScreen
 import com.vipin.harrypotter.ui.characterlist.CharacterListViewModel
+import com.vipin.harrypotter.ui.charactersearch.CharacterSearchScreen
+import com.vipin.harrypotter.ui.charactersearch.CharacterSearchViewModel
 import com.vipin.harrypotter.ui.theme.HarryPotterTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.Serializable
@@ -30,6 +33,9 @@ object CharacterListRoute : AppRoute
 
 @Serializable
 data class CharacterDetailRoute(val characterId: String) : AppRoute
+
+@Serializable
+object SearchRoute : AppRoute
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -52,26 +58,12 @@ fun AppNavgraph() {
         navController = navController,
         startDestination = CharacterListRoute,
     ) {
-        composable<CharacterListRoute>(
-            exitTransition = {
-                slideOutHorizontally(
-                    targetOffsetX = { -300 },
-                    animationSpec = tween(300)
-                )
-            },
-            popEnterTransition = {
-                slideInHorizontally(
-                    initialOffsetX = { -300 },
-                    animationSpec = tween(300)
-                )
-            },
-        ) {
+        composable<CharacterListRoute> {
             val viewModel: CharacterListViewModel = hiltViewModel()
             val uiState = viewModel.uiState.collectAsState().value
 
             CharacterListScreen(
                 uiState = uiState,
-                onSearchQueryChanged = viewModel::onSearchQueryChanged,
                 onLoadMoreClicked = viewModel::loadMoreCharacters,
                 onRetryClicked = viewModel::retryInitialLoad,
                 navController = navController
@@ -79,25 +71,36 @@ fun AppNavgraph() {
         }
 
         composable<CharacterDetailRoute>(
-            enterTransition = {
-                slideInHorizontally(
-                    initialOffsetX = { 1000 },
-                    animationSpec = tween(300)
-                )
-            },
-            popExitTransition = {
-                slideOutHorizontally(
-                    targetOffsetX = { 1000 },
-                    animationSpec = tween(300)
-                )
-            }
-        ) { backStackEntry ->
+            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
+            exitTransition = { slideOutHorizontally(targetOffsetX = { -1000 }) },
+            popEnterTransition = { slideInHorizontally(initialOffsetX = { -1000 }) },
+            popExitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
+        ) {
             val viewModel: CharacterDetailViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsState()
             CharacterDetailScreen(
                 uiState = uiState,
                 onNavigateBack = navController::popBackStack,
                 onRetry = {})
+        }
+
+        composable<SearchRoute>(
+            enterTransition = { fadeIn() },
+            exitTransition = { fadeOut() },
+            popEnterTransition = { fadeIn() },
+            popExitTransition = { fadeOut() }
+        ) {
+            val viewModel: CharacterSearchViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsState()
+
+            CharacterSearchScreen(
+                uiState = uiState,
+                onQueryChange = viewModel::onSearchQueryChanged,
+                onNavigateBack = navController::popBackStack,
+                onCharacterClick = { characterId ->
+                    navController.navigate(CharacterDetailRoute(characterId))
+                }
+            )
         }
     }
 }

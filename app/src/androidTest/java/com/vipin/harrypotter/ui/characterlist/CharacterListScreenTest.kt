@@ -1,9 +1,13 @@
 package com.vipin.harrypotter.ui.characterlist
 
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.ComposeNavigator
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.testing.TestNavHostController
 import com.vipin.domain.entities.CharacterEntity
 import com.vipin.harrypotter.ui.theme.HarryPotterTheme
 import org.junit.Rule
@@ -12,7 +16,7 @@ import org.junit.Test
 class CharacterListScreenTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
     fun characterListScreen_displaysData_whenStateIsSuccess() {
@@ -48,14 +52,20 @@ class CharacterListScreenTest {
         )
 
         composeTestRule.setContent {
+            val navController = TestNavHostController(composeTestRule.activity)
+            navController.navigatorProvider.addNavigator(ComposeNavigator())
+
             HarryPotterTheme {
-                CharacterListScreen(
-                    uiState = uiState,
-                    onSearchQueryChanged = { },
-                    onLoadMoreClicked = { },
-                    onRetryClicked = { },
-                    navController = rememberNavController()
-                )
+                NavHost(navController = navController, startDestination = "test_list") {
+                    composable("test_list") {
+                        CharacterListScreen(
+                            uiState = uiState,
+                            onLoadMoreClicked = { },
+                            onRetryClicked = { },
+                            navController = navController
+                        )
+                    }
+                }
             }
         }
 
