@@ -4,10 +4,18 @@ An Android application that showcases characters from the Harry Potter universe,
 
 ## Screenshots
 
-(Here you can add screenshots of your app's main screens, like the character list, search, and detail views.)
+- Character List
 
-- Character List Screenshot
-- Character Details Screenshot
+  <img width="277" height="590" alt="image" src="https://github.com/user-attachments/assets/a450b11b-1c8d-43eb-81db-641bcf2d8cf8" />
+
+- Character Details
+
+  <img width="277" height="593" alt="image" src="https://github.com/user-attachments/assets/0369cea2-a9a5-4bfa-86ee-6c82d961dd23" />
+
+- Character Search
+
+  <img width="276" height="593" alt="image" src="https://github.com/user-attachments/assets/f20fff10-eb82-49ad-bbdd-c60e97f1998f" />
+
 
 ## Features
 
